@@ -10,18 +10,6 @@
  */
 package com.ibm.wala.core.tests.callGraph;
 
-import java.io.IOException;
-import java.util.Set;
-import java.util.function.Function;
-
-import com.ibm.wala.classLoader.Language;
-import com.ibm.wala.ipa.callgraph.CallGraphBuilder;
-import com.ibm.wala.ipa.callgraph.impl.Util;
-import com.ibm.wala.ipa.callgraph.propagation.InstanceKey;
-import com.ibm.wala.ipa.callgraph.propagation.PointerAnalysis;
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.ibm.wala.classLoader.CallSiteReference;
 import com.ibm.wala.core.tests.util.TestConstants;
 import com.ibm.wala.core.tests.util.WalaTestCase;
@@ -43,6 +31,7 @@ import com.ibm.wala.util.collections.Iterator2Iterable;
 import com.ibm.wala.util.strings.Atom;
 import java.io.IOException;
 import java.util.Set;
+import java.util.function.Function;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -50,11 +39,14 @@ import org.junit.Test;
 public class LambdaTest extends WalaTestCase {
 
   @Test
-  public void testBug144() throws IOException, ClassHierarchyException, IllegalArgumentException, CancelException {
-    AnalysisScope scope = CallGraphTestUtil.makeJ2SEAnalysisScope(TestConstants.WALA_TESTDATA, CallGraphTestUtil.REGRESSION_EXCLUSIONS);
+  public void testBug144()
+      throws IOException, ClassHierarchyException, IllegalArgumentException, CancelException {
+    AnalysisScope scope =
+        CallGraphTestUtil.makeJ2SEAnalysisScope(
+            TestConstants.WALA_TESTDATA, CallGraphTestUtil.REGRESSION_EXCLUSIONS);
     ClassHierarchy cha = ClassHierarchyFactory.make(scope);
-    Iterable<Entrypoint> entrypoints = com.ibm.wala.ipa.callgraph.impl.Util.makeMainEntrypoints(scope, cha,
-            "Lbug144/A");
+    Iterable<Entrypoint> entrypoints =
+        com.ibm.wala.ipa.callgraph.impl.Util.makeMainEntrypoints(scope, cha, "Lbug144/A");
     AnalysisOptions options = CallGraphTestUtil.makeAnalysisOptions(scope, entrypoints);
 
     @SuppressWarnings("unused")
@@ -63,38 +55,51 @@ public class LambdaTest extends WalaTestCase {
   }
 
   @Test
-  public void testBug137() throws IOException, ClassHierarchyException, IllegalArgumentException, CancelException {
-    AnalysisScope scope = CallGraphTestUtil.makeJ2SEAnalysisScope(TestConstants.WALA_TESTDATA, CallGraphTestUtil.REGRESSION_EXCLUSIONS);
+  public void testBug137()
+      throws IOException, ClassHierarchyException, IllegalArgumentException, CancelException {
+    AnalysisScope scope =
+        CallGraphTestUtil.makeJ2SEAnalysisScope(
+            TestConstants.WALA_TESTDATA, CallGraphTestUtil.REGRESSION_EXCLUSIONS);
     ClassHierarchy cha = ClassHierarchyFactory.make(scope);
-    Iterable<Entrypoint> entrypoints = com.ibm.wala.ipa.callgraph.impl.Util.makeMainEntrypoints(scope, cha,
-            "Lspecial/A");
+    Iterable<Entrypoint> entrypoints =
+        com.ibm.wala.ipa.callgraph.impl.Util.makeMainEntrypoints(scope, cha, "Lspecial/A");
     AnalysisOptions options = CallGraphTestUtil.makeAnalysisOptions(scope, entrypoints);
 
-    CallGraph cg = CallGraphTestUtil.buildZeroCFA(options, new AnalysisCacheImpl(), cha, scope, false);
+    CallGraph cg =
+        CallGraphTestUtil.buildZeroCFA(options, new AnalysisCacheImpl(), cha, scope, false);
 
     TypeReference A = TypeReference.findOrCreate(ClassLoaderReference.Application, "Lspecial/A");
 
-    MethodReference ct = MethodReference.findOrCreate(A, Atom.findOrCreateUnicodeAtom("<init>"), Descriptor.findOrCreateUTF8("()V"));
+    MethodReference ct =
+        MethodReference.findOrCreate(
+            A, Atom.findOrCreateUnicodeAtom("<init>"), Descriptor.findOrCreateUTF8("()V"));
     Set<CGNode> ctnodes = cg.getNodes(ct);
     Assert.assertEquals(1, ctnodes.size());
 
-    MethodReference ts = MethodReference.findOrCreate(A, Atom.findOrCreateUnicodeAtom("toString"), Descriptor.findOrCreateUTF8("()Ljava/lang/String;"));
+    MethodReference ts =
+        MethodReference.findOrCreate(
+            A,
+            Atom.findOrCreateUnicodeAtom("toString"),
+            Descriptor.findOrCreateUTF8("()Ljava/lang/String;"));
     Set<CGNode> tsnodes = cg.getNodes(ts);
     Assert.assertEquals(1, tsnodes.size());
   }
 
   @Test
-  public void testSortingExample() throws ClassHierarchyException, IllegalArgumentException, CancelException, IOException {
+  public void testSortingExample()
+      throws ClassHierarchyException, IllegalArgumentException, CancelException, IOException {
 
     AnalysisScope scope =
         CallGraphTestUtil.makeJ2SEAnalysisScope(
             TestConstants.WALA_TESTDATA, CallGraphTestUtil.REGRESSION_EXCLUSIONS);
     ClassHierarchy cha = ClassHierarchyFactory.make(scope);
-    Iterable<Entrypoint> entrypoints = com.ibm.wala.ipa.callgraph.impl.Util.makeMainEntrypoints(scope, cha,
-            "Llambda/SortingExample");
+    Iterable<Entrypoint> entrypoints =
+        com.ibm.wala.ipa.callgraph.impl.Util.makeMainEntrypoints(
+            scope, cha, "Llambda/SortingExample");
     AnalysisOptions options = CallGraphTestUtil.makeAnalysisOptions(scope, entrypoints);
 
-    CallGraph cg = CallGraphTestUtil.buildZeroCFA(options, new AnalysisCacheImpl(), cha, scope, false);
+    CallGraph cg =
+        CallGraphTestUtil.buildZeroCFA(options, new AnalysisCacheImpl(), cha, scope, false);
 
     // Find compareTo
     TypeReference str =
@@ -133,44 +138,41 @@ public class LambdaTest extends WalaTestCase {
   }
 
   @Test
-  public void testMethodRefs() throws ClassHierarchyException, IllegalArgumentException, CancelException, IOException {
+  public void testMethodRefs()
+      throws ClassHierarchyException, IllegalArgumentException, CancelException, IOException {
 
-    AnalysisScope scope = CallGraphTestUtil.makeJ2SEAnalysisScope(TestConstants.WALA_TESTDATA, CallGraphTestUtil.REGRESSION_EXCLUSIONS);
+    AnalysisScope scope =
+        CallGraphTestUtil.makeJ2SEAnalysisScope(
+            TestConstants.WALA_TESTDATA, CallGraphTestUtil.REGRESSION_EXCLUSIONS);
     ClassHierarchy cha = ClassHierarchyFactory.make(scope);
-    Iterable<Entrypoint> entrypoints = com.ibm.wala.ipa.callgraph.impl.Util.makeMainEntrypoints(scope, cha,
-            "Llambda/MethodRefs");
+    Iterable<Entrypoint> entrypoints =
+        com.ibm.wala.ipa.callgraph.impl.Util.makeMainEntrypoints(scope, cha, "Llambda/MethodRefs");
     AnalysisOptions options = CallGraphTestUtil.makeAnalysisOptions(scope, entrypoints);
 
+    CallGraph cg =
+        CallGraphTestUtil.buildZeroCFA(options, new AnalysisCacheImpl(), cha, scope, false);
 
-    CallGraph cg = CallGraphTestUtil.buildZeroCFA(options, new AnalysisCacheImpl(), cha, scope, false);
-
-    Function<String, MethodReference> getTargetRef = (klass) -> {
-      return MethodReference.findOrCreate(
-              TypeReference.findOrCreate(ClassLoaderReference.Application, "Llambda/MethodRefs$" + klass),
+    Function<String, MethodReference> getTargetRef =
+        (klass) -> {
+          return MethodReference.findOrCreate(
+              TypeReference.findOrCreate(
+                  ClassLoaderReference.Application, "Llambda/MethodRefs$" + klass),
               Atom.findOrCreateUnicodeAtom("target"),
               Descriptor.findOrCreateUTF8("()V"));
-    };
+        };
 
     System.out.println(cg);
     Assert.assertEquals(
-            "expected C1.target() to be reachable",
-            1,
-            cg.getNodes(getTargetRef.apply("C2")).size());
+        "expected C1.target() to be reachable", 1, cg.getNodes(getTargetRef.apply("C2")).size());
     Assert.assertEquals(
-            "expected C2.target() to be reachable",
-            1,
-            cg.getNodes(getTargetRef.apply("C2")).size());
+        "expected C2.target() to be reachable", 1, cg.getNodes(getTargetRef.apply("C2")).size());
     Assert.assertEquals(
-            "expected C3.target() to be reachable",
-            1,
-            cg.getNodes(getTargetRef.apply("C3")).size());
+        "expected C3.target() to be reachable", 1, cg.getNodes(getTargetRef.apply("C3")).size());
     Assert.assertEquals(
-            "expected C4.target() to be reachable",
-            1,
-            cg.getNodes(getTargetRef.apply("C4")).size());
+        "expected C4.target() to be reachable", 1, cg.getNodes(getTargetRef.apply("C4")).size());
     Assert.assertEquals(
-            "expected C5.target() to *not* be reachable",
-            0,
-            cg.getNodes(getTargetRef.apply("C5")).size());
+        "expected C5.target() to *not* be reachable",
+        0,
+        cg.getNodes(getTargetRef.apply("C5")).size());
   }
 }
