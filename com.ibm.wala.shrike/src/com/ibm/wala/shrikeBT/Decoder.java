@@ -184,6 +184,21 @@ public abstract class Decoder implements Constants {
     this.constantPool = cp;
   }
 
+  /**
+   * This constructor is only supposed to be used by subclasses.
+   * It is for OWL to pass shrikeBT instructions directly
+   *
+   * @param instructions the shrikeBT instructions constructed by OWL
+   * @param handlers the exception handlers
+   */
+  protected Decoder(IInstruction[] instructions, ExceptionHandler[][] handlers) {
+    this.instructions = instructions;
+    this.handlers = handlers;
+    this.code = null;
+    this.rawHandlers = null;
+    this.constantPool = null;
+  }
+
   public ConstantPoolReader getConstantPool() {
     return constantPool;
   }
